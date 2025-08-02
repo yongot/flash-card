@@ -1,0 +1,18 @@
+{
+  "chapters": [
+    {
+      "id": "chapter1-family",
+      "title": "Family Members",
+      "description": "Learn family member names in Chinese",
+      "order": 1,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "chapter2-food",
+      "title": "Food Items",
+      "description": "Common food and drinks in Chinese",
+      "order": 2,
+      "difficulty": "beginner"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "type": "text",
+    "front": "Sunny",
+    "back": "Bright and warm with sunshine"
+  },
+  {
+    "type": "audio",
+    "front": "Rainy",
+    "back": "Water falling from the sky",
+    "audio": "audio/rainy.mp3"
+  },
+  {
+    "type": "full",
+    "front": "Cloudy",
+    "back": "Sky covered with clouds",
+    "audio": "audio/cloudy.mp3",
+    "image": "images/cloudy.jpg"
+  },
+  {
+    "type": "text",
+    "front": "Windy",
+    "back": "Air moving fast, making things blow around"
+  }
+]

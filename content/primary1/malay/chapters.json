@@ -1,0 +1,18 @@
+{
+  "chapters": [
+    {
+      "id": "chapter1-greetings",
+      "title": "Greetings",
+      "description": "Basic greetings and polite expressions",
+      "order": 1,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "chapter2-school",
+      "title": "School Items",
+      "description": "Things you find in school",
+      "order": 2,
+      "difficulty": "beginner"
+    }
+  ]
+}

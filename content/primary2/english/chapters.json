@@ -1,0 +1,18 @@
+{
+  "chapters": [
+    {
+      "id": "chapter1-shapes",
+      "title": "Shapes",
+      "description": "Basic geometric shapes",
+      "order": 1,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "chapter2-weather",
+      "title": "Weather",
+      "description": "Weather conditions and descriptions",
+      "order": 2,
+      "difficulty": "intermediate"
+    }
+  ]
+}

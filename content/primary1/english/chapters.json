@@ -1,0 +1,25 @@
+{
+  "chapters": [
+    {
+      "id": "chapter1-animals",
+      "title": "Animals",
+      "description": "Learn about different animals",
+      "order": 1,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "chapter2-colors",
+      "title": "Colors",
+      "description": "Basic colors and their names",
+      "order": 2,
+      "difficulty": "beginner"
+    },
+    {
+      "id": "chapter3-numbers",
+      "title": "Numbers 1-10",
+      "description": "Count from one to ten",
+      "order": 3,
+      "difficulty": "intermediate"
+    }
+  ]
+}

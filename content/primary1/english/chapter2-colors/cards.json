@@ -1,0 +1,30 @@
+[
+  {
+    "type": "text",
+    "front": "Red",
+    "back": "The color of strawberries and fire trucks"
+  },
+  {
+    "type": "text",
+    "front": "Blue",
+    "back": "The color of the sky and ocean"
+  },
+  {
+    "type": "audio",
+    "front": "Green",
+    "back": "The color of grass and leaves",
+    "audio": "audio/green.mp3"
+  },
+  {
+    "type": "text",
+    "front": "Yellow",
+    "back": "The color of the sun and bananas"
+  },
+  {
+    "type": "full",
+    "front": "Purple",
+    "back": "The color made by mixing red and blue",
+    "audio": "audio/purple.mp3",
+    "image": "images/purple.jpg"
+  }
+]

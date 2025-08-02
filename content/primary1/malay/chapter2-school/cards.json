@@ -1,0 +1,25 @@
+[
+  {
+    "type": "text",
+    "front": "Pensil",
+    "back": "Pencil"
+  },
+  {
+    "type": "audio",
+    "front": "Buku",
+    "back": "Book",
+    "audio": "audio/buku.mp3"
+  },
+  {
+    "type": "text",
+    "front": "Meja",
+    "back": "Table/Desk"
+  },
+  {
+    "type": "full",
+    "front": "Papan tulis",
+    "back": "Blackboard",
+    "audio": "audio/papantulis.mp3",
+    "image": "images/blackboard.jpg"
+  }
+]

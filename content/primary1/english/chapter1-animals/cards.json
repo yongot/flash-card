@@ -1,0 +1,32 @@
+[
+  {
+    "type": "text",
+    "front": "Cat",
+    "back": "A small furry pet that says meow"
+  },
+  {
+    "type": "audio",
+    "front": "Dog",
+    "back": "A loyal animal that barks",
+    "audio": "audio/dog.mp3"
+  },
+  {
+    "type": "full",
+    "front": "Bird",
+    "back": "An animal that can fly and has wings",
+    "audio": "audio/bird.mp3",
+    "image": "images/bird.jpg"
+  },
+  {
+    "type": "text",
+    "front": "Fish",
+    "back": "An animal that lives in water and swims"
+  },
+  {
+    "type": "full",
+    "front": "Elephant",
+    "back": "A very large animal with a long trunk",
+    "audio": "audio/elephant.mp3",
+    "image": "images/elephant.jpg"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "type": "text",
+    "front": "One",
+    "back": "The number 1"
+  },
+  {
+    "type": "audio",
+    "front": "Two",
+    "back": "The number 2",
+    "audio": "audio/two.mp3"
+  },
+  {
+    "type": "text",
+    "front": "Three",
+    "back": "The number 3"
+  },
+  {
+    "type": "full",
+    "front": "Four",
+    "back": "The number 4",
+    "audio": "audio/four.mp3",
+    "image": "images/four.jpg"
+  },
+  {
+    "type": "text",
+    "front": "Five",
+    "back": "The number 5"
+  }
+]

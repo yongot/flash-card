@@ -1,0 +1,25 @@
+[
+  {
+    "type": "text",
+    "front": "Circle",
+    "back": "A round shape with no corners"
+  },
+  {
+    "type": "audio",
+    "front": "Square",
+    "back": "A shape with four equal sides",
+    "audio": "audio/square.mp3"
+  },
+  {
+    "type": "full",
+    "front": "Triangle",
+    "back": "A shape with three sides and three corners",
+    "audio": "audio/triangle.mp3",
+    "image": "images/triangle.jpg"
+  },
+  {
+    "type": "text",
+    "front": "Rectangle",
+    "back": "A shape with four sides, opposite sides are equal"
+  }
+]

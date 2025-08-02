@@ -1,0 +1,20 @@
+[
+  {
+    "type": "text",
+    "front": "苹果 (píngguǒ)",
+    "back": "Apple"
+  },
+  {
+    "type": "audio",
+    "front": "水 (shuǐ)",
+    "back": "Water",
+    "audio": "audio/shui.mp3"
+  },
+  {
+    "type": "full",
+    "front": "面包 (miànbāo)",
+    "back": "Bread",
+    "audio": "audio/mianbao.mp3",
+    "image": "images/bread.jpg"
+  }
+]

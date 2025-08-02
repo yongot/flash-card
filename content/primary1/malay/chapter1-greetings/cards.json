@@ -1,0 +1,25 @@
+[
+  {
+    "type": "text",
+    "front": "Selamat pagi",
+    "back": "Good morning"
+  },
+  {
+    "type": "audio",
+    "front": "Terima kasih",
+    "back": "Thank you",
+    "audio": "audio/terimakasih.mp3"
+  },
+  {
+    "type": "text",
+    "front": "Maaf",
+    "back": "Sorry/Excuse me"
+  },
+  {
+    "type": "full",
+    "front": "Selamat tinggal",
+    "back": "Goodbye",
+    "audio": "audio/goodbye.mp3",
+    "image": "images/goodbye.jpg"
+  }
+]

@@ -1,0 +1,25 @@
+[
+  {
+    "type": "text",
+    "front": "爸爸 (bàba)",
+    "back": "Father/Dad"
+  },
+  {
+    "type": "audio",
+    "front": "妈妈 (māma)",
+    "back": "Mother/Mom",
+    "audio": "audio/mama.mp3"
+  },
+  {
+    "type": "text",
+    "front": "哥哥 (gēge)",
+    "back": "Older brother"
+  },
+  {
+    "type": "full",
+    "front": "妹妹 (mèimei)",
+    "back": "Younger sister",
+    "audio": "audio/meimei.mp3",
+    "image": "images/sister.jpg"
+  }
+]
