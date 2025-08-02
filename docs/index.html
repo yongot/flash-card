@@ -1,0 +1,1943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Card Learning Adventure</title>
+    <style>
+        :root {
+            --primary-blue: #4299e1;
+            --primary-green: #48bb78;
+            --accent-orange: #ed8936;
+            --accent-yellow: #ecc94b;
+            --success-green: #38a169;
+            --warning-red: #e53e3e;
+            --neutral-gray: #718096;
+            --background-light: #f7fafc;
+            --text-dark: #2d3748;
+            --text-light: #ffffff;
+            --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+            --shadow-strong: 0 15px 35px rgba(0, 0, 0, 0.2);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --animation-fast: 0.2s;
+            --animation-medium: 0.4s;
+            --animation-slow: 0.6s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .app-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: var(--text-light);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .app-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        /* ===== ACHIEVEMENT BADGES (LEVEL SELECTION) ===== */
+        .selection-screen {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+        }
+
+        .selection-section {
+            background: var(--text-light);
+            border-radius: var(--border-radius-large);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .selection-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-green), var(--accent-orange));
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 2px;
+        }
+
+        /* Level Badges Grid */
+        .level-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-badge {
+            position: relative;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            border: 4px solid transparent;
+            overflow: hidden;
+        }
+
+        .level-badge::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: conic-gradient(from 0deg, var(--accent-orange), var(--accent-yellow), var(--success-green), var(--primary-blue));
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--animation-medium);
+        }
+
+        .level-badge:hover {
+            transform: scale(1.05) translateY(-4px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .level-badge:hover::before {
+            opacity: 1;
+        }
+
+        .level-badge.selected {
+            transform: scale(1.08) translateY(-6px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .level-badge.selected::before {
+            opacity: 1;
+        }
+
+        .level-badge.completed {
+            background: linear-gradient(135deg, var(--success-green), var(--accent-yellow));
+        }
+
+        .level-badge.locked {
+            background: var(--neutral-gray);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .badge-content {
+            text-align: center;
+            color: var(--text-light);
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-progress {
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: conic-gradient(var(--success-green) 0% var(--progress, 0%), transparent var(--progress, 0%) 100%);
+            opacity: 0.3;
+        }
+
+        .badge-achievement {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-yellow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-medium);
+            opacity: 0;
+            transform: scale(0);
+            transition: all var(--animation-medium);
+        }
+
+        .level-badge.completed .badge-achievement {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Language Character Cards */
+        .language-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .language-card {
+            background: var(--text-light);
+            border-radius: var(--border-radius-large);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .language-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .language-card:hover::before {
+            left: 100%;
+        }
+
+        .language-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .language-card.selected {
+            border-color: var(--primary-blue);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .language-card.english {
+            background: linear-gradient(135deg, #3182ce, #2b77cb);
+            color: var(--text-light);
+        }
+
+        .language-card.chinese {
+            background: linear-gradient(135deg, #c53030, #d53f41);
+            color: var(--text-light);
+        }
+
+        .language-card.malay {
+            background: linear-gradient(135deg, #38a169, #48bb78);
+            color: var(--text-light);
+        }
+
+        .language-mascot {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .language-card:hover .language-mascot {
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            50% { transform: translateY(-20px); }
+            75% { transform: translateY(-10px); }
+        }
+
+        .language-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .language-description {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Quest Map Chapter Selection */
+        .chapter-quest-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .quest-map {
+            position: relative;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: var(--border-radius-large);
+            padding: 2rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .quest-map::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quest-path {
+            display: flex;
+            align-items: center;
+            min-width: max-content;
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .quest-path::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-orange));
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .chapter-node {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            border: 4px solid var(--accent-yellow);
+            z-index: 2;
+            scroll-snap-align: center;
+            margin: 0 2rem;
+        }
+
+        .chapter-node:hover {
+            transform: scale(1.1) translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .chapter-node.selected {
+            transform: scale(1.15) translateY(-12px);
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .chapter-node.completed {
+            background: linear-gradient(135deg, var(--success-green), var(--accent-yellow));
+            color: var(--text-light);
+        }
+
+        .chapter-node.locked {
+            background: var(--neutral-gray);
+            border-color: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .chapter-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .chapter-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .chapter-progress {
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: conic-gradient(var(--success-green) 0% var(--progress, 0%), transparent var(--progress, 0%) 100%);
+            opacity: 0.7;
+        }
+
+        .quest-navigation {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--animation-fast);
+            box-shadow: var(--shadow-medium);
+            z-index: 3;
+        }
+
+        .quest-navigation:hover {
+            background: var(--text-light);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .quest-nav-left {
+            left: 1rem;
+        }
+
+        .quest-nav-right {
+            right: 1rem;
+        }
+
+        /* Start Adventure Button */
+        .start-adventure-btn {
+            background: linear-gradient(135deg, var(--success-green), var(--primary-green));
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--border-radius-large);
+            padding: 1.5rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--animation-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-medium);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-adventure-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .start-adventure-btn:hover::before {
+            left: 100%;
+        }
+
+        .start-adventure-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .start-adventure-btn:disabled {
+            background: var(--neutral-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .start-adventure-btn:disabled::before {
+            display: none;
+        }
+
+        /* ===== PRESENTATION MODE ===== */
+        .presentation-mode {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 100;
+        }
+
+        .presentation-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-soft);
+            z-index: 110;
+        }
+
+        .presentation-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .chapter-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .progress-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--success-green));
+            border-radius: 4px;
+            transition: width var(--animation-medium);
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .presentation-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            background: var(--primary-blue);
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--animation-fast);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .control-btn.secondary {
+            background: var(--neutral-gray);
+        }
+
+        .control-btn.danger {
+            background: var(--warning-red);
+        }
+
+        /* Enhanced Flash Card */
+        .card-stage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+            perspective: 1200px;
+        }
+
+        .flash-card-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform var(--animation-slow) cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flash-card-3d.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face-3d {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: var(--border-radius-large);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            box-shadow: var(--shadow-strong);
+            text-align: center;
+        }
+
+        .card-front-3d {
+            background: linear-gradient(135deg, var(--text-light), #f7fafc);
+            color: var(--text-dark);
+        }
+
+        .card-back-3d {
+            background: linear-gradient(135deg, var(--primary-blue), #3182ce);
+            color: var(--text-light);
+            transform: rotateY(180deg);
+        }
+
+        .card-text-large {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+            word-break: break-word;
+        }
+
+        .card-image-large {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            object-fit: contain;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .card-audio-large {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .audio-btn-large {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            border: 3px solid var(--text-light);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--animation-fast);
+            font-size: 2rem;
+        }
+
+        .audio-btn-large:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .audio-status-large {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Navigation Footer */
+        .presentation-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn-large {
+            background: var(--primary-blue);
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--animation-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn-large:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .nav-btn-large:disabled {
+            background: var(--neutral-gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-btn-large.secondary {
+            background: var(--neutral-gray);
+        }
+
+        .nav-btn-large.danger {
+            background: var(--warning-red);
+        }
+
+        /* Flip Hint */
+        .flip-hint-large {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius-large);
+            font-size: 1.1rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Completion Modal */
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--text-light);
+            border-radius: var(--border-radius-large);
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            margin: 2rem;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+        }
+
+        .modal-content::before {
+            content: '🎉';
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            animation: celebration 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes celebration {
+            0% { transform: translateX(-50%) scale(1); }
+            100% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        .modal-message {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #fed7d7;
+            color: var(--warning-red);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: none;
+            border-left: 4px solid var(--warning-red);
+            font-weight: 600;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Keyboard Navigation Hints */
+        .keyboard-hints {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--text-light);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            z-index: 200;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all var(--animation-medium);
+            pointer-events: none;
+        }
+
+        .keyboard-hints.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hint-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .hint-key {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 1.5rem 1rem;
+            }
+
+            .selection-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .level-badges {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .language-cards {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .quest-map {
+                padding: 1rem;
+            }
+
+            .chapter-node {
+                width: 100px;
+                height: 100px;
+                margin: 0 1rem;
+            }
+
+            .chapter-icon {
+                font-size: 1.5rem;
+            }
+
+            .chapter-title {
+                font-size: 0.7rem;
+            }
+
+            .card-stage {
+                width: 95%;
+                height: 60vh;
+            }
+
+            .card-face-3d {
+                padding: 2rem;
+            }
+
+            .card-text-large {
+                font-size: clamp(1.5rem, 8vw, 2.5rem);
+            }
+
+            .presentation-header {
+                padding: 1rem;
+            }
+
+            .presentation-info {
+                gap: 1rem;
+            }
+
+            .chapter-name {
+                font-size: 1.2rem;
+            }
+
+            .progress-bar {
+                width: 120px;
+            }
+
+            .presentation-footer {
+                padding: 1rem;
+            }
+
+            .nav-btn-large {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .keyboard-hints {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .level-badges {
+                grid-template-columns: 1fr;
+            }
+
+            .badge-number {
+                font-size: 2rem;
+            }
+
+            .language-mascot {
+                font-size: 3rem;
+            }
+
+            .modal-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .modal-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-dark: #f7fafc;
+                --background-light: #2d3748;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">Flash Card Adventure</h1>
+            <p class="app-subtitle">Embark on your learning journey!</p>
+        </header>
+
+        <!-- Selection Screen -->
+        <main id="selectionScreen" class="selection-screen">
+            <!-- Error Message -->
+            <div id="errorMessage" class="error-message" role="alert" aria-live="polite"></div>
+            
+            <!-- Level Selection -->
+            <section class="selection-section">
+                <h2 class="section-title">Choose Your Level</h2>
+                <div class="level-badges" role="group" aria-label="Primary level selection">
+                    <div class="level-badge" data-level="1" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">1</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">⭐</div>
+                    </div>
+                    <div class="level-badge" data-level="2" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">2</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">⭐</div>
+                    </div>
+                    <div class="level-badge locked" data-level="3" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">3</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">🔒</div>
+                    </div>
+                    <div class="level-badge locked" data-level="4" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">4</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">🔒</div>
+                    </div>
+                    <div class="level-badge locked" data-level="5" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">5</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">🔒</div>
+                    </div>
+                    <div class="level-badge locked" data-level="6" role="button" tabindex="0" aria-pressed="false">
+                        <div class="badge-progress" style="--progress: 0%"></div>
+                        <div class="badge-content">
+                            <div class="badge-number">6</div>
+                            <div class="badge-label">Primary</div>
+                        </div>
+                        <div class="badge-achievement">🔒</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Language Selection -->
+            <section class="selection-section">
+                <h2 class="section-title">Choose Your Language</h2>
+                <div class="language-cards" role="group" aria-label="Language selection">
+                    <div class="language-card english" data-subject="english" role="button" tabindex="0" aria-pressed="false">
+                        <div class="language-mascot">🦉</div>
+                        <div class="language-name">English</div>
+                        <div class="language-description">Learn with Owlbert the Wise</div>
+                    </div>
+                    <div class="language-card chinese" data-subject="chinese" role="button" tabindex="0" aria-pressed="false">
+                        <div class="language-mascot">🐼</div>
+                        <div class="language-name">Chinese</div>
+                        <div class="language-description">Discover with Panda Po</div>
+                    </div>
+                    <div class="language-card malay" data-subject="malay" role="button" tabindex="0" aria-pressed="false">
+                        <div class="language-mascot">🐅</div>
+                        <div class="language-name">Malay</div>
+                        <div class="language-description">Adventure with Tiger Rimau</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chapter Quest Map -->
+            <section class="selection-section">
+                <h2 class="section-title">Choose Your Quest</h2>
+                <div class="chapter-quest-container">
+                    <div id="questMap" class="quest-map">
+                        <div id="questPath" class="quest-path">
+                            <div class="loading" style="color: white; text-align: center; width: 100%;">
+                                Select a level and language to see available quests
+                            </div>
+                        </div>
+                    </div>
+                    <button class="quest-navigation quest-nav-left hidden" id="questNavLeft" aria-label="Scroll left">
+                        ←
+                    </button>
+                    <button class="quest-navigation quest-nav-right hidden" id="questNavRight" aria-label="Scroll right">
+                        →
+                    </button>
+                </div>
+            </section>
+
+            <!-- Start Adventure Button -->
+            <button id="startAdventureBtn" class="start-adventure-btn" disabled>
+                🚀 Start Your Adventure!
+            </button>
+        </main>
+
+        <!-- Presentation Mode -->
+        <div id="presentationMode" class="presentation-mode">
+            <!-- Header -->
+            <div class="presentation-header">
+                <div class="presentation-info">
+                    <div id="chapterName" class="chapter-name">Chapter Name</div>
+                    <div class="progress-display">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="progressText" class="progress-text">1 / 5</div>
+                    </div>
+                </div>
+                <div class="presentation-controls">
+                    <button id="helpBtn" class="control-btn" aria-label="Show keyboard shortcuts">
+                        ❓ Help
+                    </button>
+                    <button id="exitPresentationBtn" class="control-btn danger" aria-label="Exit to selection">
+                        ✖ Exit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Stage -->
+            <div class="card-stage">
+                <div id="flashCard3D" class="flash-card-3d" role="button" tabindex="0" aria-label="Flash card - click to flip">
+                    <div class="card-face-3d card-front-3d">
+                        <div id="frontTextLarge" class="card-text-large">Question</div>
+                        <img id="frontImageLarge" class="card-image-large hidden" alt="">
+                        <div id="frontAudioLarge" class="card-audio-large hidden">
+                            <button id="playAudioBtnLarge" class="audio-btn-large" aria-label="Play audio">
+                                ▶
+                            </button>
+                            <span id="audioStatusLarge" class="audio-status-large"></span>
+                        </div>
+                    </div>
+                    <div class="card-face-3d card-back-3d">
+                        <div id="backTextLarge" class="card-text-large">Answer</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flip Hint -->
+            <div id="flipHintLarge" class="flip-hint-large hidden">
+                💡 Click the card or press SPACE to reveal the answer
+            </div>
+
+            <!-- Footer Navigation -->
+            <div class="presentation-footer">
+                <button id="prevCardBtn" class="nav-btn-large" aria-label="Previous card">
+                    ← Previous
+                </button>
+                <div style="display: flex; gap: 1rem;">
+                    <button id="audioControlBtn" class="nav-btn-large secondary hidden" aria-label="Play audio">
+                        🔊 Audio
+                    </button>
+                    <button id="fullscreenBtn" class="nav-btn-large secondary" aria-label="Toggle fullscreen">
+                        ⛶ Fullscreen
+                    </button>
+                </div>
+                <button id="nextCardBtn" class="nav-btn-large" aria-label="Next card">
+                    Next →
+                </button>
+            </div>
+        </div>
+
+        <!-- Completion Modal -->
+        <div id="completionModal" class="completion-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal-content">
+                <h2 id="modalTitle" class="modal-title">Quest Complete!</h2>
+                <p id="modalMessage" class="modal-message">Congratulations! You've mastered this chapter.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button id="nextQuestBtn" class="start-adventure-btn hidden" style="width: auto; padding: 1rem 2rem;">
+                        Next Quest
+                    </button>
+                    <button id="backToSelectionFromModal" class="control-btn secondary" style="padding: 1rem 2rem;">
+                        New Adventure
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Hints -->
+        <div id="keyboardHints" class="keyboard-hints">
+            <div class="hint-item">
+                <span>Flip Card</span>
+                <span class="hint-key">SPACE</span>
+            </div>
+            <div class="hint-item">
+                <span>Previous</span>
+                <span class="hint-key">←</span>
+            </div>
+            <div class="hint-item">
+                <span>Next</span>
+                <span class="hint-key">→</span>
+            </div>
+            <div class="hint-item">
+                <span>Play Audio</span>
+                <span class="hint-key">P</span>
+            </div>
+            <div class="hint-item">
+                <span>Exit</span>
+                <span class="hint-key">ESC</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <audio id="audioPlayer" preload="none"></audio>
+
+    <script>
+        class FlashCardAdventure {
+            constructor() {
+                // Core state
+                this.currentLevel = null;
+                this.currentSubject = null;
+                this.currentChapter = null;
+                this.chapters = [];
+                this.cards = [];
+                this.currentCardIndex = 0;
+                this.isFlipped = false;
+                this.firstCardView = true;
+                this.presentationMode = false;
+                
+                // Gamification state
+                this.progressData = this.loadProgress();
+                this.currentSession = {
+                    startTime: Date.now(),
+                    cardsViewed: 0,
+                    questsCompleted: 0
+                };
+                
+                this.initializeApp();
+            }
+
+            initializeApp() {
+                this.initializeEventListeners();
+                this.initializeKeyboardNavigation();
+                this.initializeGestureControls();
+                this.updateProgressDisplay();
+            }
+
+            initializeEventListeners() {
+                // Level selection
+                document.querySelectorAll('.level-badge').forEach(badge => {
+                    badge.addEventListener('click', (e) => this.selectLevel(e.currentTarget.dataset.level));
+                    badge.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.selectLevel(e.currentTarget.dataset.level);
+                        }
+                    });
+                });
+
+                // Language selection
+                document.querySelectorAll('.language-card').forEach(card => {
+                    card.addEventListener('click', (e) => this.selectSubject(e.currentTarget.dataset.subject));
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.selectSubject(e.currentTarget.dataset.subject);
+                        }
+                    });
+                });
+
+                // Start adventure
+                document.getElementById('startAdventureBtn').addEventListener('click', () => this.startAdventure());
+
+                // Quest map navigation
+                document.getElementById('questNavLeft').addEventListener('click', () => this.scrollQuestMap('left'));
+                document.getElementById('questNavRight').addEventListener('click', () => this.scrollQuestMap('right'));
+
+                // Presentation mode controls
+                document.getElementById('flashCard3D').addEventListener('click', () => this.flipCard());
+                document.getElementById('prevCardBtn').addEventListener('click', () => this.previousCard());
+                document.getElementById('nextCardBtn').addEventListener('click', () => this.nextCard());
+                document.getElementById('exitPresentationBtn').addEventListener('click', () => this.exitPresentation());
+                document.getElementById('helpBtn').addEventListener('click', () => this.toggleKeyboardHints());
+                document.getElementById('fullscreenBtn').addEventListener('click', () => this.toggleFullscreen());
+                document.getElementById('playAudioBtnLarge').addEventListener('click', () => this.playAudio());
+                document.getElementById('audioControlBtn').addEventListener('click', () => this.playAudio());
+
+                // Modal controls
+                document.getElementById('nextQuestBtn').addEventListener('click', () => this.nextQuest());
+                document.getElementById('backToSelectionFromModal').addEventListener('click', () => this.exitPresentation());
+
+                // Audio player events
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.addEventListener('ended', () => this.onAudioEnded());
+                audioPlayer.addEventListener('error', () => this.onAudioError());
+            }
+
+            initializeKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    if (!this.presentationMode) return;
+
+                    switch(e.key.toLowerCase()) {
+                        case ' ':
+                        case 'enter':
+                            e.preventDefault();
+                            this.flipCard();
+                            break;
+                        case 'arrowleft':
+                        case 'a':
+                            e.preventDefault();
+                            this.previousCard();
+                            break;
+                        case 'arrowright':
+                        case 'd':
+                            e.preventDefault();
+                            this.nextCard();
+                            break;
+                        case 'p':
+                            e.preventDefault();
+                            this.playAudio();
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            this.replayAudio();
+                            break;
+                        case 'escape':
+                            e.preventDefault();
+                            this.exitPresentation();
+                            break;
+                        case 'h':
+                            e.preventDefault();
+                            this.toggleKeyboardHints();
+                            break;
+                        case 'f':
+                            e.preventDefault();
+                            this.toggleFullscreen();
+                            break;
+                        default:
+                            // Number keys for direct card navigation
+                            if (e.key >= '1' && e.key <= '9') {
+                                const cardNumber = parseInt(e.key) - 1;
+                                if (cardNumber < this.cards.length) {
+                                    this.jumpToCard(cardNumber);
+                                }
+                            }
+                            break;
+                    }
+                });
+            }
+
+            initializeGestureControls() {
+                if ('ontouchstart' in window) {
+                    let startX = 0;
+                    let startY = 0;
+                    let startTime = 0;
+
+                    const cardElement = document.getElementById('flashCard3D');
+
+                    cardElement.addEventListener('touchstart', (e) => {
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        startTime = Date.now();
+                    }, { passive: true });
+
+                    cardElement.addEventListener('touchend', (e) => {
+                        if (!this.presentationMode) return;
+
+                        const endX = e.changedTouches[0].clientX;
+                        const endY = e.changedTouches[0].clientY;
+                        const deltaX = endX - startX;
+                        const deltaY = endY - startY;
+                        const deltaTime = Date.now() - startTime;
+
+                        // Tap to flip
+                        if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30 && deltaTime < 300) {
+                            this.flipCard();
+                            return;
+                        }
+
+                        // Swipe gestures
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                            if (deltaX > 0) {
+                                this.previousCard(); // Swipe right = previous
+                            } else {
+                                this.nextCard(); // Swipe left = next
+                            }
+                        }
+                    }, { passive: true });
+                }
+            }
+
+            selectLevel(level) {
+                // Check if level is locked
+                const badge = document.querySelector(`[data-level="${level}"]`);
+                if (badge.classList.contains('locked')) {
+                    this.showMessage('This level is locked! Complete previous levels to unlock.', 'warning');
+                    return;
+                }
+
+                this.currentLevel = level;
+                this.updateSelection('.level-badge', `[data-level="${level}"]`);
+                this.loadChapters();
+                this.updateStartButton();
+                this.animateSelection(badge);
+            }
+
+            selectSubject(subject) {
+                this.currentSubject = subject;
+                this.updateSelection('.language-card', `[data-subject="${subject}"]`);
+                this.loadChapters();
+                this.updateStartButton();
+                
+                const card = document.querySelector(`[data-subject="${subject}"]`);
+                this.animateSelection(card);
+            }
+
+            selectChapter(chapterId) {
+                this.currentChapter = chapterId;
+                this.updateSelection('.chapter-node', `[data-chapter="${chapterId}"]`);
+                this.updateStartButton();
+                
+                const node = document.querySelector(`[data-chapter="${chapterId}"]`);
+                this.animateSelection(node);
+            }
+
+            updateSelection(containerSelector, selectedSelector) {
+                document.querySelectorAll(containerSelector).forEach(element => {
+                    element.classList.remove('selected');
+                    element.setAttribute('aria-pressed', 'false');
+                });
+                
+                const selected = document.querySelector(selectedSelector);
+                if (selected) {
+                    selected.classList.add('selected');
+                    selected.setAttribute('aria-pressed', 'true');
+                }
+            }
+
+            animateSelection(element) {
+                element.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    element.style.transform = '';
+                }, 200);
+            }
+
+            async loadChapters() {
+                if (!this.currentLevel || !this.currentSubject) {
+                    document.getElementById('questPath').innerHTML = 
+                        '<div class="loading" style="color: white; text-align: center; width: 100%;">Select a level and language to see available quests</div>';
+                    return;
+                }
+
+                document.getElementById('questPath').innerHTML = 
+                    '<div class="loading" style="color: white; text-align: center; width: 100%;">Loading quests...</div>';
+
+                try {
+                    const response = await fetch(`content/primary${this.currentLevel}/${this.currentSubject}/chapters.json`);
+                    if (!response.ok) throw new Error('Chapters not found');
+                    
+                    const data = await response.json();
+                    this.chapters = data.chapters.sort((a, b) => a.order - b.order);
+                    this.renderQuestMap();
+                } catch (error) {
+                    this.showError('No quests available for this combination. Try a different level or language!');
+                    document.getElementById('questPath').innerHTML = 
+                        '<div class="loading" style="color: white; text-align: center; width: 100%;">No quests available</div>';
+                }
+            }
+
+            renderQuestMap() {
+                const questPath = document.getElementById('questPath');
+                questPath.innerHTML = '';
+
+                const icons = ['🦁', '🌟', '🎯', '🏆', '💎', '🚀', '⚡', '🔥'];
+
+                this.chapters.forEach((chapter, index) => {
+                    const node = document.createElement('div');
+                    node.className = 'chapter-node';
+                    node.dataset.chapter = chapter.id;
+                    node.setAttribute('role', 'button');
+                    node.setAttribute('tabindex', '0');
+                    node.setAttribute('aria-pressed', 'false');
+                    
+                    const progress = this.getChapterProgress(chapter.id);
+                    const isCompleted = progress >= 100;
+                    const isLocked = index > 0 && this.getChapterProgress(this.chapters[index - 1].id) < 100;
+                    
+                    if (isCompleted) {
+                        node.classList.add('completed');
+                    } else if (isLocked) {
+                        node.classList.add('locked');
+                    }
+                    
+                    node.innerHTML = `
+                        <div class="chapter-progress" style="--progress: ${progress}%"></div>
+                        <div class="chapter-icon">${icons[index % icons.length]}</div>
+                        <div class="chapter-title">${chapter.title}</div>
+                    `;
+
+                    node.addEventListener('click', () => this.selectChapter(chapter.id));
+                    node.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.selectChapter(chapter.id);
+                        }
+                    });
+
+                    questPath.appendChild(node);
+                });
+
+                this.updateQuestNavigation();
+            }
+
+            updateQuestNavigation() {
+                const questMap = document.getElementById('questMap');
+                const navLeft = document.getElementById('questNavLeft');
+                const navRight = document.getElementById('questNavRight');
+                
+                const canScrollLeft = questMap.scrollLeft > 0;
+                const canScrollRight = questMap.scrollLeft < questMap.scrollWidth - questMap.clientWidth;
+                
+                navLeft.classList.toggle('hidden', !canScrollLeft);
+                navRight.classList.toggle('hidden', !canScrollRight);
+            }
+
+            scrollQuestMap(direction) {
+                const questMap = document.getElementById('questMap');
+                const scrollAmount = 200;
+                
+                if (direction === 'left') {
+                    questMap.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                } else {
+                    questMap.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                }
+                
+                setTimeout(() => this.updateQuestNavigation(), 300);
+            }
+
+            updateStartButton() {
+                const btn = document.getElementById('startAdventureBtn');
+                const canStart = this.currentLevel && this.currentSubject && this.currentChapter;
+                btn.disabled = !canStart;
+                
+                if (canStart) {
+                    btn.textContent = '🚀 Start Your Adventure!';
+                } else {
+                    btn.textContent = '🗺️ Choose Your Path Above';
+                }
+            }
+
+            async startAdventure() {
+                if (!this.currentLevel || !this.currentSubject || !this.currentChapter) return;
+
+                try {
+                    const response = await fetch(`content/primary${this.currentLevel}/${this.currentSubject}/${this.currentChapter}/cards.json`);
+                    if (!response.ok) throw new Error('Cards not found');
+                    
+                    this.cards = await response.json();
+                    if (this.cards.length === 0) {
+                        this.showError('No cards found in this quest. Try another one!');
+                        return;
+                    }
+                    
+                    this.currentCardIndex = 0;
+                    this.enterPresentationMode();
+                    this.displayCard();
+                    this.showFlipHint();
+                } catch (error) {
+                    this.showError('Failed to load quest cards. Please try again!');
+                }
+            }
+
+            enterPresentationMode() {
+                this.presentationMode = true;
+                document.getElementById('selectionScreen').style.display = 'none';
+                document.getElementById('presentationMode').style.display = 'block';
+                
+                const selectedChapter = this.chapters.find(c => c.id === this.currentChapter);
+                document.getElementById('chapterName').textContent = selectedChapter ? selectedChapter.title : 'Adventure';
+                
+                this.updateProgress();
+                
+                // Request fullscreen on mobile for better experience
+                if (window.innerWidth < 768) {
+                    this.requestFullscreen();
+                }
+            }
+
+            exitPresentation() {
+                this.presentationMode = false;
+                document.getElementById('selectionScreen').style.display = 'block';
+                document.getElementById('presentationMode').style.display = 'none';
+                document.getElementById('completionModal').style.display = 'none';
+                document.getElementById('keyboardHints').classList.remove('visible');
+                this.hideError();
+                this.firstCardView = true;
+                
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            }
+
+            displayCard() {
+                if (this.cards.length === 0) return;
+
+                const card = this.cards[this.currentCardIndex];
+                const cardElement = document.getElementById('flashCard3D');
+                
+                // Reset flip state
+                cardElement.classList.remove('flipped');
+                this.isFlipped = false;
+
+                // Update content
+                document.getElementById('frontTextLarge').textContent = card.front;
+                document.getElementById('backTextLarge').textContent = card.back;
+
+                // Handle image
+                const frontImage = document.getElementById('frontImageLarge');
+                frontImage.classList.add('hidden');
+                
+                if (card.type === 'full' && card.image) {
+                    frontImage.src = `content/primary${this.currentLevel}/${this.currentSubject}/${this.currentChapter}/${card.image}`;
+                    frontImage.alt = card.front;
+                    frontImage.classList.remove('hidden');
+                    frontImage.onerror = () => frontImage.classList.add('hidden');
+                }
+
+                // Handle audio
+                const frontAudio = document.getElementById('frontAudioLarge');
+                const audioControlBtn = document.getElementById('audioControlBtn');
+                
+                frontAudio.classList.add('hidden');
+                audioControlBtn.classList.add('hidden');
+                
+                if ((card.type === 'audio' || card.type === 'full') && card.audio) {
+                    frontAudio.classList.remove('hidden');
+                    audioControlBtn.classList.remove('hidden');
+                    document.getElementById('audioPlayer').src = `content/primary${this.currentLevel}/${this.currentSubject}/${this.currentChapter}/${card.audio}`;
+                }
+
+                this.updateNavigation();
+                this.updateProgress();
+                this.currentSession.cardsViewed++;
+                
+                // Focus management
+                cardElement.focus();
+            }
+
+            flipCard() {
+                const cardElement = document.getElementById('flashCard3D');
+                cardElement.classList.toggle('flipped');
+                this.isFlipped = !this.isFlipped;
+                
+                const ariaLabel = this.isFlipped 
+                    ? 'Flash card showing answer - click to flip back' 
+                    : 'Flash card showing question - click to see answer';
+                cardElement.setAttribute('aria-label', ariaLabel);
+                
+                // Hide flip hint after first use
+                if (this.firstCardView && this.isFlipped) {
+                    document.getElementById('flipHintLarge').classList.add('hidden');
+                    this.firstCardView = false;
+                }
+            }
+
+            previousCard() {
+                if (this.currentCardIndex > 0) {
+                    this.currentCardIndex--;
+                    this.displayCard();
+                }
+            }
+
+            nextCard() {
+                if (this.currentCardIndex < this.cards.length - 1) {
+                    this.currentCardIndex++;
+                    this.displayCard();
+                } else {
+                    this.completeQuest();
+                }
+            }
+
+            jumpToCard(index) {
+                if (index >= 0 && index < this.cards.length) {
+                    this.currentCardIndex = index;
+                    this.displayCard();
+                }
+            }
+
+            updateNavigation() {
+                const prevBtn = document.getElementById('prevCardBtn');
+                const nextBtn = document.getElementById('nextCardBtn');
+                
+                prevBtn.disabled = this.currentCardIndex === 0;
+                nextBtn.textContent = this.currentCardIndex === this.cards.length - 1 ? 'Complete Quest →' : 'Next →';
+            }
+
+            updateProgress() {
+                const progressFill = document.getElementById('progressFill');
+                const progressText = document.getElementById('progressText');
+                
+                const percentage = ((this.currentCardIndex + 1) / this.cards.length) * 100;
+                progressFill.style.width = `${percentage}%`;
+                progressText.textContent = `${this.currentCardIndex + 1} / ${this.cards.length}`;
+            }
+
+            playAudio() {
+                const audioPlayer = document.getElementById('audioPlayer');
+                const audioBtn = document.getElementById('playAudioBtnLarge');
+                const audioStatus = document.getElementById('audioStatusLarge');
+
+                if (audioPlayer.src) {
+                    audioBtn.textContent = '⏸';
+                    audioStatus.textContent = 'Playing...';
+                    
+                    audioPlayer.play().catch(error => {
+                        console.error('Audio playback failed:', error);
+                        this.onAudioError();
+                    });
+                }
+            }
+
+            replayAudio() {
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.currentTime = 0;
+                this.playAudio();
+            }
+
+            onAudioEnded() {
+                document.getElementById('playAudioBtnLarge').textContent = '▶';
+                document.getElementById('audioStatusLarge').textContent = '';
+            }
+
+            onAudioError() {
+                document.getElementById('playAudioBtnLarge').textContent = '▶';
+                document.getElementById('audioStatusLarge').textContent = 'Audio unavailable';
+            }
+
+            completeQuest() {
+                this.currentSession.questsCompleted++;
+                this.updateChapterProgress(this.currentChapter, 100);
+                this.showCompletionModal();
+            }
+
+            showCompletionModal() {
+                const modal = document.getElementById('completionModal');
+                const nextQuestBtn = document.getElementById('nextQuestBtn');
+                
+                const currentChapterIndex = this.chapters.findIndex(c => c.id === this.currentChapter);
+                const hasNextQuest = currentChapterIndex < this.chapters.length - 1;
+                
+                if (hasNextQuest) {
+                    const nextChapter = this.chapters[currentChapterIndex + 1];
+                    nextQuestBtn.classList.remove('hidden');
+                    nextQuestBtn.textContent = `Next: ${nextChapter.title}`;
+                } else {
+                    nextQuestBtn.classList.add('hidden');
+                }
+                
+                modal.style.display = 'flex';
+                document.getElementById('backToSelectionFromModal').focus();
+            }
+
+            nextQuest() {
+                const currentChapterIndex = this.chapters.findIndex(c => c.id === this.currentChapter);
+                if (currentChapterIndex < this.chapters.length - 1) {
+                    const nextChapter = this.chapters[currentChapterIndex + 1];
+                    this.currentChapter = nextChapter.id;
+                    document.getElementById('completionModal').style.display = 'none';
+                    this.startAdventure();
+                }
+            }
+
+            toggleKeyboardHints() {
+                const hints = document.getElementById('keyboardHints');
+                hints.classList.toggle('visible');
+            }
+
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    this.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+
+            requestFullscreen() {
+                const element = document.documentElement;
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.webkitRequestFullscreen) {
+                    element.webkitRequestFullscreen();
+                } else if (element.msRequestFullscreen) {
+                    element.msRequestFullscreen();
+                }
+            }
+
+            showFlipHint() {
+                if (this.firstCardView) {
+                    const hint = document.getElementById('flipHintLarge');
+                    hint.classList.remove('hidden');
+                    setTimeout(() => {
+                        if (this.firstCardView) {
+                            hint.classList.add('hidden');
+                        }
+                    }, 5000);
+                }
+            }
+
+            // Progress tracking and gamification
+            loadProgress() {
+                try {
+                    return JSON.parse(localStorage.getItem('flashCardProgress') || '{}');
+                } catch {
+                    return {};
+                }
+            }
+
+            saveProgress() {
+                try {
+                    localStorage.setItem('flashCardProgress', JSON.stringify(this.progressData));
+                } catch (error) {
+                    console.warn('Could not save progress:', error);
+                }
+            }
+
+            getChapterProgress(chapterId) {
+                const key = `${this.currentLevel}-${this.currentSubject}-${chapterId}`;
+                return this.progressData[key] || 0;
+            }
+
+            updateChapterProgress(chapterId, progress) {
+                const key = `${this.currentLevel}-${this.currentSubject}-${chapterId}`;
+                this.progressData[key] = Math.max(this.progressData[key] || 0, progress);
+                this.saveProgress();
+                this.updateProgressDisplay();
+            }
+
+            updateProgressDisplay() {
+                // Update level badges with progress
+                document.querySelectorAll('.level-badge').forEach(badge => {
+                    const level = badge.dataset.level;
+                    // Calculate overall progress for this level (simplified)
+                    const progressElement = badge.querySelector('.badge-progress');
+                    if (progressElement) {
+                        progressElement.style.setProperty('--progress', '0%');
+                    }
+                });
+            }
+
+            showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            hideError() {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
+
+            showMessage(message, type = 'info') {
+                // Create a temporary notification
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 2rem;
+                    right: 2rem;
+                    background: ${type === 'warning' ? '#fed7d7' : '#c6f6d5'};
+                    color: ${type === 'warning' ? '#c53030' : '#2f855a'};
+                    padding: 1rem 1.5rem;
+                    border-radius: 0.5rem;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize the application
+        const app = new FlashCardAdventure();
+
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

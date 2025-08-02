@@ -1,13 +1,14 @@
-# Flash Card Learning System
+# Flash Card Learning Adventure
 
-A responsive, static web application for educational flash cards targeting primary school students (grades 1-6). Built with pure HTML, CSS, and JavaScript - perfect for GitHub Pages deployment.
+A gamified, responsive web application for educational flash cards targeting primary school students (grades 1-6). Features achievement badges, character mascots, quest maps, and immersive full-screen learning. Built with pure HTML, CSS, and JavaScript - perfect for GitHub Pages deployment.
 
 ## 🚀 Quick Start
 
 1. **Clone or download** this repository
-2. **Open `index.html`** in your web browser
-3. **Select level, subject, and chapter** to start learning
-4. **Click cards to flip** and see answers
+2. **Open `public/index.html`** in your web browser
+3. **Choose your level badge and language character**
+4. **Select a quest from the adventure map**
+5. **Start your learning adventure!**
 
 ## 📁 Project Structure
 
@@ -44,12 +45,13 @@ flash-card/
 
 ## ✨ Features
 
-### 🎯 User Interface
-- **Intuitive Selection**: Easy level, subject, and chapter selection
-- **Responsive Design**: Works on mobile, tablet, and desktop
-- **Smooth Animations**: Card flip animations and transitions
-- **Progress Tracking**: Shows current position and chapter completion
-- **Accessibility**: Keyboard navigation and screen reader support
+### 🎯 Gamified User Interface
+- **Achievement Badges**: Circular level badges with progress rings and unlock states
+- **Character Mascots**: Animated language characters (Owlbert 🦉, Panda Po 🐼, Tiger Rimau 🐅)
+- **Quest Map**: Horizontal scrolling adventure map with themed chapter icons
+- **Full-Screen Presentation**: Immersive learning mode with enhanced card interactions
+- **Progress Tracking**: Real-time progress bars and completion celebrations
+- **Touch & Keyboard**: Complete gesture and keyboard navigation support
 
 ### 📚 Flash Card Types
 
@@ -83,12 +85,14 @@ flash-card/
 }
 ```
 
-### 🎮 Navigation & Controls
-- **Card Flipping**: Click/tap cards or press Space
-- **Navigation**: Previous/Next buttons or arrow keys
-- **Chapter Progression**: Automatic next chapter suggestions
-- **Audio Playback**: Built-in audio controls with error handling
-- **Back to Selection**: Easy return to level/subject/chapter selection
+### 🎮 Enhanced Navigation & Controls
+- **Card Flipping**: Click/tap cards, press Space/Enter, or swipe
+- **Navigation**: Previous/Next buttons, arrow keys, or WASD
+- **Quest Progression**: Automatic next quest unlocking with visual celebrations
+- **Audio Playback**: Enhanced audio controls with visual feedback
+- **Touch Gestures**: Swipe left/right to navigate, tap to flip
+- **Keyboard Shortcuts**: Complete keyboard control (Space, arrows, P, R, ESC, H, F, 1-9)
+- **Fullscreen Mode**: Immersive presentation mode with help overlay
 
 ## 🛠️ Adding Content
 
